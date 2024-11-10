@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     position:'absolute',
-    bottom: 0,
+    bottom: 40,
     left: 0,
     right: 0,
   },
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
-    marginBottom:60
+    marginBottom:90
   },
   floatingButtonText: {
     color: '#FFFFFF',

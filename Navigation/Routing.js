@@ -11,9 +11,6 @@ import LocationsScreen from '../screen/LocationPage';
 import WelcomeScreen from '../screen/OnBoardingPage';
 import NewAssetScreen from '../screen/NewAssetPage';
 import ProductFeaturesScreen from '../screen/MoreScreen';
-
-
-
 const Stack = createNativeStackNavigator();
 
 function Routing() {

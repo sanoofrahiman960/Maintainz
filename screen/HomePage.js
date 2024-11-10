@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,25 +10,42 @@ import {
   Easing,
   Dimensions,
 } from 'react-native';
-import { Clock, Plus, QrCode, HelpCircle, AlertCircle, CheckCircle, Menu, Briefcase, PieChart, User } from 'lucide-react-native';
+import { Clock, Plus, QrCode, HelpCircle, AlertCircle, CheckCircle, User } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import Footer from './FooterPage';
+import { BarCodeScanner } from 'expo-barcode-scanner';
 
 const { width } = Dimensions.get('window');
 const cardWidth = (width - 48) / 2; // 16px padding on each side, 16px gap
 
 export default function DashboardScreen() {
   const [scaleAnim] = useState(new Animated.Value(0.95));
-    const navigation = useNavigation();
-    const [activeTab, setActiveTab] = useState('Overview');
-  React.useEffect(() => {
+  const navigation = useNavigation();
+  const [activeTab, setActiveTab] = useState('Overview');
+  const [hasPermission, setHasPermission] = useState(null);
+  const [isScanning, setIsScanning] = useState(false);
+  const [scannedData, setScannedData] = useState(null);
+
+  useEffect(() => {
     Animated.timing(scaleAnim, {
       toValue: 1,
       duration: 300,
       easing: Easing.out(Easing.cubic),
       useNativeDriver: true,
     }).start();
+
+    // Request camera permission
+    (async () => {
+      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      setHasPermission(status === 'granted');
+    })();
   }, []);
+
+  const handleBarCodeScanned = ({ type, data }) => {
+    setIsScanning(false); // Stop the scanner
+    setScannedData(data); // Save scanned data
+    alert(`Scanned data: ${data}`);
+  };
 
   const actionButtons = [
     { id: 1, title: 'Due Today', icon: Clock, color: '#4CAF50' },
@@ -38,38 +55,22 @@ export default function DashboardScreen() {
   ];
 
   const statusCards = [
-    { 
-      id: 1, 
-      title: 'High Priority', 
-      icon: AlertCircle,
-      count: 3,
-      color: '#F44336'
-    },
-    { 
-      id: 2, 
-      title: 'Overdue', 
-      icon: Clock,
-      count: 0,
-      color: '#FF9800'
-    },
-    { 
-      id: 3, 
-      title: 'Pending Approval', 
-      icon: AlertCircle,
-      count: 5,
-      color: '#4CAF50'
-    },
-    { 
-      id: 4, 
-      title: 'Completed', 
-      icon: CheckCircle,
-      count: 12,
-      color: '#2196F3'
-    },
+    { id: 1, title: 'High Priority', icon: AlertCircle, count: 3, color: '#F44336' },
+    { id: 2, title: 'Overdue', icon: Clock, count: 0, color: '#FF9800' },
+    { id: 3, title: 'Pending Approval', icon: AlertCircle, count: 5, color: '#4CAF50' },
+    { id: 4, title: 'Completed', icon: CheckCircle, count: 12, color: '#2196F3' },
   ];
 
   const renderActionButton = ({ title, icon: Icon, color }) => (
-    <TouchableOpacity style={styles.actionButton} key={title}>
+    <TouchableOpacity
+      style={styles.actionButton}
+      key={title}
+      onPress={() => {
+        if (title === 'Scan Code') {
+          setIsScanning(true); // Activate scanner
+        }
+      }}
+    >
       <View style={[styles.actionIconContainer, { backgroundColor: color }]}>
         <Icon size={24} color="#FFFFFF" />
       </View>
@@ -87,6 +88,20 @@ export default function DashboardScreen() {
     </TouchableOpacity>
   );
 
+  if (isScanning) {
+    return (
+      <View style={styles.scannerContainer}>
+        <BarCodeScanner
+          onBarCodeScanned={handleBarCodeScanned}
+          style={StyleSheet.absoluteFillObject}
+        />
+        <TouchableOpacity style={styles.closeScannerButton} onPress={() => setIsScanning(false)}>
+          <Text style={styles.closeScannerButtonText}>Cancel</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
@@ -99,7 +114,6 @@ export default function DashboardScreen() {
           </View>
 
           <View style={styles.welcome}>
-            {/* <Text style={styles.greeting}>Hello, John</Text> */}
             <Text style={styles.organisation}>Welcome to Mash Solutions</Text>
           </View>
 
@@ -113,7 +127,6 @@ export default function DashboardScreen() {
               {statusCards.map(renderStatusCard)}
             </View>
           </View>
-
           <View style={styles.todoSection}>
             <Text style={styles.sectionTitle}>TODOLIST</Text>
             <View style={styles.todoCard}>
@@ -135,29 +148,6 @@ export default function DashboardScreen() {
         </Animated.View>
       </ScrollView>
 
-      <TouchableOpacity style={styles.createButton}>
-        <Plus size={24} color="#FFFFFF" />
-        <Text style={styles.createButtonText}>Create</Text>
-      </TouchableOpacity>
-
-      {/* <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.bottomNavItem}>
-          <PieChart size={24} color="#2196F3" />
-          <Text style={[styles.bottomNavText, styles.bottomNavActive]}>Overview</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={()=>navigation.navigate('WorkOrderList')} style={styles.bottomNavItem}>
-          <Briefcase size={24} color="#757575" />
-          <Text style={styles.bottomNavText}>Work Orders</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={()=>navigation.navigate('Asset')} style={styles.bottomNavItem}>
-          <Briefcase size={24} color="#757575" />
-          <Text style={styles.bottomNavText}>Asset</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.bottomNavItem}>
-          <Menu size={24} color="#757575" />
-          <Text style={styles.bottomNavText}>More</Text>
-        </TouchableOpacity>
-      </View> */}
       <Footer
         activeTab={activeTab}
         onTabPress={(tab) => setActiveTab(tab)}
@@ -377,6 +367,24 @@ const styles = StyleSheet.create({
   },
   bottomNavActive: {
     color: '#2196F3',
+    fontWeight: 'bold',
+  },
+  scannerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeScannerButton: {
+    position: 'absolute',
+    bottom: 40,
+    backgroundColor: '#2196F3',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+  },
+  closeScannerButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
     fontWeight: 'bold',
   },
 });

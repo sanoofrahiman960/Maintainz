@@ -16,6 +16,8 @@
     "@types/react": "~18.2.79",
     "axios": "^1.7.7",
     "expo": "~51.0.28",
+    "expo-barcode-scanner": "^13.0.1",
+    "expo-camera": "^15.0.16",
     "expo-linear-gradient": "^13.0.2",
     "expo-status-bar": "~1.12.1",
     "lucide-react-native": "^0.252.0",
