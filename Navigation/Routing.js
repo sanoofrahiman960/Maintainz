@@ -10,6 +10,7 @@ import WorkOrdersList from '../screen/WorkOrderListing';
 import LocationsScreen from '../screen/LocationPage';
 import WelcomeScreen from '../screen/OnBoardingPage';
 import NewAssetScreen from '../screen/NewAssetPage';
+import ProductFeaturesScreen from '../screen/MoreScreen';
 
 
 
@@ -28,10 +29,9 @@ function Routing() {
         {/* <Stack.Screen name="Asset" component={LocationsScreen} options={{ headerShown: false }}/> */}
         <Stack.Screen name="OnBoard" component={WelcomeScreen} options={{ headerShown: false }}/>
         <Stack.Screen name="NewAsset" component={NewAssetScreen} options={{ headerShown: false }}/>
-
-        <Stack.Screen name="WorkOrders" component={WorkOrdersList} />
-        <Stack.Screen name="Assets" component={LocationsScreen} />
-        {/* <Stack.Screen name="More" component={MoreScreen} /> */}
+        <Stack.Screen name="WorkOrders" component={WorkOrdersList} options={{ headerShown: false }}/>
+        <Stack.Screen name="Assets" component={LocationsScreen} options={{ headerShown: false }}/>
+        <Stack.Screen name="More" component={ProductFeaturesScreen} options={{ headerShown: false }}/> 
       </Stack.Navigator>
     </NavigationContainer>
     </GestureHandlerRootView>
