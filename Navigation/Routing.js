@@ -11,6 +11,7 @@ import LocationsScreen from '../screen/LocationPage';
 import WelcomeScreen from '../screen/OnBoardingPage';
 import NewAssetScreen from '../screen/NewAssetPage';
 import ProductFeaturesScreen from '../screen/MoreScreen';
+import WorkDummy from '../dummy/workorderdummy';
 const Stack = createNativeStackNavigator();
 
 function Routing() {
@@ -19,11 +20,11 @@ function Routing() {
     <NavigationContainer>
       <Stack.Navigator >
         {/* <Stack.Screen name="Home" component={DashboardScreen} options={{ headerShown: false }}/> */}
+        <Stack.Screen name="Dummy" component={WorkDummy} options={{ headerShown: false }}/>
         <Stack.Screen name="Overview" component={DashboardScreen} />
         <Stack.Screen name="Filter" component={FilterScreen} options={{ headerShown: false }}/>
         <Stack.Screen name="Procedure" component={InspectionForm} options={{ headerShown: false }}/>
         {/* <Stack.Screen name="WorkOrderList" component={WorkOrdersList} options={{ headerShown: false }}/> */}
-        {/* <Stack.Screen name="Asset" component={LocationsScreen} options={{ headerShown: false }}/> */}
         <Stack.Screen name="OnBoard" component={WelcomeScreen} options={{ headerShown: false }}/>
         <Stack.Screen name="NewAsset" component={NewAssetScreen} options={{ headerShown: false }}/>
         <Stack.Screen name="WorkOrders" component={WorkOrdersList} options={{ headerShown: false }}/>

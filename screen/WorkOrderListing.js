@@ -2,31 +2,24 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
-  ScrollView,
-  TouchableOpacity,
   StyleSheet,
-  SafeAreaView,
+  TouchableOpacity,
   TextInput,
+  SafeAreaView,
+  StatusBar,
+  ScrollView,
   Image,
 } from 'react-native';
-import { Search, Filter, Plus, PieChart, Briefcase, Menu, Check,ChevronRight,CalendarCheck } from 'lucide-react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import Footer from './FooterPage';
-export default function WorkOrdersList() {
-  const [activeTabs, setActiveTabs] = useState('ToDo');
-  const [date, setDate] = useState(new Date()); // Set an initial date
-  const [show, setShow] = useState(false);
+import { CalendarCheck, Filter, Plus, Check, ChevronRight } from 'lucide-react-native';
+import Calendars from '../components/Calendar';
+import Footer from '../screen/FooterPage';
+import { useNavigation } from '@react-navigation/native';
+
+export default function WorkOrderScreen() {
   const [activeTab, setActiveTab] = useState('WorkOrders');
-
-  const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date; // Use selectedDate or keep the current date
-    // setShow(Platform.OS === 'ios'); // Close picker on Android
-    setDate(currentDate); // Update selected date
-  };
-
-  const showDatePicker = () => {
-    setShow(true);
-  };
+  const [activeTabs, setActiveTabs] = useState('ToDo');
+  const [show, setShow] = useState(false);
+  const navigation = useNavigation()
   const workOrders = [
     { id: 7, title: 'Title', completedBy: 'NAME', status: 'Done', priority: null },
     { id: 8, title: 'Title', completedBy: 'NAME', status: 'Pending', priority: null },
@@ -37,15 +30,13 @@ export default function WorkOrdersList() {
   ];
 
   const renderWorkOrder = (order) => (
-    <>
-    {activeTabs == 'Done'?
-    <TouchableOpacity key={order.id} style={styles.workOrderItem}>
+    <TouchableOpacity key={order.id} style={styles.workOrderCard}>
       <View style={styles.workOrderLeft}>
         <Image
           source={{ uri: 'https://thumbs.dreamstime.com/b/generic-person-gray-photo-placeholder-man-silhouette-white-background-144511705.jpg' }}
           style={styles.workOrderImage}
         />
-        <View style={styles.workOrderInfo}>
+        <View style={styles.workOrderDetails}>
           <Text style={styles.workOrderTitle}>{order.title}</Text>
           <Text style={styles.workOrderSubtitle}>Completed by {order.completedBy}</Text>
           <Text style={styles.workOrderId}>#{order.id}</Text>
@@ -60,7 +51,7 @@ export default function WorkOrdersList() {
               <Text style={[
                 styles.statusText,
                 order.status === 'Done' && styles.statusTextDone
-              ]}>Done</Text>
+              ]}>{order.status}</Text>
             </TouchableOpacity>
             {order.priority === 'High' && (
               <View style={styles.priorityTag}>
@@ -74,15 +65,16 @@ export default function WorkOrdersList() {
         <ChevronRight size={20} color="#666" />
       </TouchableOpacity>
     </TouchableOpacity>
-    :null}
-    </>
   );
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" />
+      
+      {/* Header */}
       <View style={styles.header}>
         <View style={styles.searchContainer}>
-          <CalendarCheck onPress={()=>setShow(true)} size={20} color="#666"/>
+          <CalendarCheck onPress={() => navigation.navigate('Dummy')} size={20} color="#666"/>
           <TextInput
             style={styles.searchInput}
             placeholder="Search Work Orders"
@@ -111,45 +103,34 @@ export default function WorkOrdersList() {
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* Calendar */}
       {show && (
-        <DateTimePicker
-        testID='dateTimePicker'
-        value={date}
-        mode="date" // Can be 'time' or 'datetime' as needed
-        display="default"
-        onChange={onChange}
-      />
+        <View style={styles.calendarContainer}>
+          <Calendars />
+        </View>
       )}
+
+      {/* Work Orders List */}
       <ScrollView style={styles.content}>
-        {workOrders.map(renderWorkOrder)}
+        {workOrders.filter(order => 
+          (activeTabs === 'ToDo' && order.status === 'Pending') || 
+          (activeTabs === 'Done' && order.status === 'Done')
+        ).map(renderWorkOrder)}
       </ScrollView>
 
+      {/* Floating Action Button */}
       <TouchableOpacity style={styles.fab}>
-        <Plus size={24} color="#FFFFFF" />
+        <Plus size={24} color="white" />
       </TouchableOpacity>
 
-      {/* <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.bottomNavItem}>
-          <PieChart size={24} color="#666" />
-          <Text style={styles.bottomNavText}>Overview</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.bottomNavItem, styles.bottomNavItemActive]}>
-          <Briefcase size={24} color="#2196F3" />
-          <Text style={[styles.bottomNavText, styles.bottomNavTextActive]}>Work Orders</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.bottomNavItem}>
-          <Briefcase size={24} color="#666" />
-          <Text style={styles.bottomNavText}>Assets</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.bottomNavItem}>
-          <Menu size={24} color="#666" />
-          <Text style={styles.bottomNavText}>More</Text>
-        </TouchableOpacity>
-      </View> */}
-      <Footer
-        activeTab={activeTab}
-        onTabPress={(tab) => setActiveTab(tab)}
-      />
+      {/* Footer */}
+      <View style={styles.footer}>
+        <Footer 
+          activeTab={activeTab}
+          onTabPress={(tab) => setActiveTab(tab)}
+        />
+      </View>
     </SafeAreaView>
   );
 }
@@ -157,7 +138,7 @@ export default function WorkOrdersList() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#fff',
   },
   header: {
     padding: 16,
@@ -169,12 +150,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
     marginBottom: 16,
-  },
-  avatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#F5F5F5',
   },
   searchInput: {
     flex: 1,
@@ -205,10 +180,13 @@ const styles = StyleSheet.create({
     color: '#2196F3',
     fontWeight: '500',
   },
+  calendarContainer: {
+    // Add styles for calendar container if needed
+  },
   content: {
     flex: 1,
   },
-  workOrderItem: {
+  workOrderCard: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -227,7 +205,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
     marginRight: 12,
   },
-  workOrderInfo: {
+  workOrderDetails: {
     flex: 1,
   },
   workOrderTitle: {
@@ -294,28 +272,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
-    marginBottom:26
   },
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    padding: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
-    backgroundColor: '#FFFFFF',
-  },
-  bottomNavItem: {
-    alignItems: 'center',
-  },
-  bottomNavItemActive: {
-    color: '#2196F3',
-  },
-  bottomNavText: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 4,
-  },
-  bottomNavTextActive: {
-    color: '#2196F3',
+  footer: {
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
   },
 });
