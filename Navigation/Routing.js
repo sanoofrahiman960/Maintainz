@@ -20,8 +20,8 @@ function Routing() {
     <NavigationContainer>
       <Stack.Navigator >
         {/* <Stack.Screen name="Home" component={DashboardScreen} options={{ headerShown: false }}/> */}
+        <Stack.Screen name="Overview" component={DashboardScreen} options={{ headerShown: false }}/>
         <Stack.Screen name="Dummy" component={WorkDummy} options={{ headerShown: false }}/>
-        <Stack.Screen name="Overview" component={DashboardScreen} />
         <Stack.Screen name="Filter" component={FilterScreen} options={{ headerShown: false }}/>
         <Stack.Screen name="Procedure" component={InspectionForm} options={{ headerShown: false }}/>
         {/* <Stack.Screen name="WorkOrderList" component={WorkOrdersList} options={{ headerShown: false }}/> */}

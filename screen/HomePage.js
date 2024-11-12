@@ -9,11 +9,13 @@ import {
   Animated,
   Easing,
   Dimensions,
+  Modal,
 } from 'react-native';
 import { Clock, Plus, QrCode, HelpCircle, AlertCircle, CheckCircle, User } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import Footer from './FooterPage';
 import { BarCodeScanner } from 'expo-barcode-scanner';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const { width } = Dimensions.get('window');
 const cardWidth = (width - 48) / 2; // 16px padding on each side, 16px gap
@@ -25,6 +27,17 @@ export default function DashboardScreen() {
   const [hasPermission, setHasPermission] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
   const [scannedData, setScannedData] = useState(null);
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  const CreateOption = ({ icon, label }) => (
+    <TouchableOpacity style={styles.createOption}>
+      <View style={styles.createIconContainer}>
+        <Icon name={icon} size={24} color="#007AFF" />
+      </View>
+      <Text style={styles.createOptionLabel}>{label}</Text>
+      <Icon name="chevron-right" size={24} color="#999" />
+    </TouchableOpacity>
+  );
 
   useEffect(() => {
     Animated.timing(scaleAnim, {
@@ -114,7 +127,7 @@ export default function DashboardScreen() {
           </View>
 
           <View style={styles.welcome}>
-            <Text style={styles.organisation}>Welcome to Mash Solutions</Text>
+            <Text style={styles.organisation}>Welcome to Organisation Name</Text>
           </View>
 
           <View style={styles.actionButtonsContainer}>
@@ -147,6 +160,41 @@ export default function DashboardScreen() {
           </View>
         </Animated.View>
       </ScrollView>
+      
+      {/* Create Modal */}
+      <Modal
+        visible={isModalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>What would you like to Create?</Text>
+              <TouchableOpacity
+                onPress={() => setModalVisible(false)}
+                style={styles.closeButton}
+              >
+                <Icon name="close" size={24} color="#000" />
+              </TouchableOpacity>
+            </View>
+            <CreateOption icon="clipboard-text" label="Work Order" />
+            <CreateOption icon="file-document" label="Procedure" />
+            <CreateOption icon="cube" label="Asset" />
+            <CreateOption icon="map-marker" label="Location" />
+            <CreateOption icon="cog" label="Part" />
+          </View>
+        </View>
+      </Modal>
+
+      {/* Floating Action Button */}
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => setModalVisible(true)}
+      >
+        <Icon name="plus" size={28} color="#FFF" />
+      </TouchableOpacity>
 
       <Footer
         activeTab={activeTab}
@@ -185,10 +233,6 @@ const styles = StyleSheet.create({
   },
   welcome: {
     marginBottom: 24,
-  },
-  greeting: {
-    fontSize: 24,
-    color: '#333333',
   },
   organisation: {
     fontSize: 26,
@@ -326,48 +370,49 @@ const styles = StyleSheet.create({
     color: '#2196F3',
     fontWeight: 'bold',
   },
-  createButton: {
-    position: 'absolute',
-    right: 16,
-    bottom: 80,
-    backgroundColor: '#2196F3',
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#FFF',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 16,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  closeButton: {
+    padding: 8,
+  },
+  createOption: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 5,
-    marginBottom:26
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#EEE',
   },
-  createButtonText: {
-    color: '#FFFFFF',
+  createIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F0F8FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  createOptionLabel: {
+    flex: 1,
     fontSize: 16,
-    fontWeight: 'bold',
-    marginLeft: 8,
-  },
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 12,
-    backgroundColor: '#FFFFFF',
-    borderTopWidth: 1,
-    borderTopColor: '#EEEEEE',
-  },
-  bottomNavItem: {
-    alignItems: 'center',
-  },
-  bottomNavText: {
-    fontSize: 12,
-    color: '#757575',
-    marginTop: 4,
-  },
-  bottomNavActive: {
-    color: '#2196F3',
-    fontWeight: 'bold',
   },
   scannerContainer: {
     flex: 1,
@@ -386,5 +431,21 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  fab: {
+    position: 'absolute',
+    width: 56,
+    height: 56,
+    alignItems: 'center',
+    justifyContent: 'center',
+    right: 20,
+    bottom: 120, // Adjusted to be above the Footer
+    backgroundColor: '#007AFF',
+    borderRadius: 28,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
   },
 });

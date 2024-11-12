@@ -21,7 +21,7 @@ export default function LocationsScreen() {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Locations</Text>
         <View style={styles.headerActions}>
-          <TouchableOpacity style={styles.headerButton}>
+          <TouchableOpacity onPress={()=> navigation.navigate('Filter')} style={styles.headerButton}>
             <Filter size={20} color="#FFFFFF" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.headerButton}>
